@@ -34,7 +34,7 @@ void loginMenu(char a[50], char pass[50])
     }
 };
 
-int getPassword(struct User u)
+const char *getPassword(struct User u)
 {
     FILE *fp;
     struct User userChecker;
@@ -46,23 +46,33 @@ int getPassword(struct User u)
     }
     while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
-        if (strcmp(userChecker.name, u.name) == 0 && strcmp(userChecker.password, u.password) == 0)
+        if (strcmp(userChecker.name, u.name) == 0)
         {
+            char *buf = userChecker.password;
             fclose(fp);
-            return 1;
+            return buf;
         }
     }
 
     fclose(fp);
-    return 0;
+    return "user not excit";
 }
 
 void Registration(struct User *user)
 {
     struct termios oflags, nflags;
     char pass[50];
-    printf("\n\t\t\t\tUser Login \n");
-    scanf("%s", user->name);
+    while (1){
+        printf("\n\t\t\t\tUser Login \n");
+        scanf("%s", user->name);
+        if(Chech_excit_user(*user)==0){
+            printf("this user name is realy used , try anthor user name ...\n");
+        }else {
+             break;
+        }
+    }
+
+
 notSame:
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
@@ -112,4 +122,21 @@ int TakeUserId()
     {
     }
     return userChecker.id;
+}
+
+int Chech_excit_user(struct User u)
+{
+    FILE *fp;
+    struct User userChecker;
+    if ((fp = fopen("./data/users.txt", "r")) == NULL)
+    {
+        printf("Error! opening file\n");
+        exit(1);
+    }
+    while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
+    {
+        if (strcmp(u.name, userChecker.name) == 0)
+            return 0;
+    }
+    return 1;
 }

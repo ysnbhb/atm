@@ -69,13 +69,12 @@ void initMenu(struct User *u)
     {
         if (scanf("%d", &option) != 1)
             clear();
-
         switch (option)
         {
         case 1:
             loginMenu(u->name, u->password);
             // printf("%s %s",u->name , u->password);
-            if (getPassword(*u))
+            if (strcmp(u->password, getPassword(*u)))
             {
                 printf("\n\nPassword Match!");
             }

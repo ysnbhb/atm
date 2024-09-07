@@ -23,7 +23,7 @@ void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
     printf("%d", r.id);
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r.id,
-            r.userId,
+            u.id,
             u.name,
             r.accountNbr,
             r.deposit.month,
@@ -106,7 +106,6 @@ void createNewAcc(struct User u)
 
 noAccount:
     r.id = 0;
-    r.userId = 0;
     system("clear");
     printf("\t\t\t===== New record =====\n");
 
@@ -121,10 +120,6 @@ noAccount:
         {
             printf("✖ This Account already exists for this user\n\n");
             goto noAccount;
-        }
-        else if (strcmp(userName, u.name) == 0)
-        {
-            r.userId++;
         }
         r.id++;
     }
