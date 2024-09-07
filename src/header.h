@@ -33,10 +33,12 @@ struct User
 void loginMenu(char a[50], char pass[50]);
 void registerMenu(char a[50], char pass[50]);
 int getPassword(struct User u);
+int TakeUserId();
+void Registration(struct User* u);
 
 // system function
 void createNewAcc(struct User u);
 void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
 void clear();
-void Rejestre(struct User* u);
+void SaveUser(struct User u);

@@ -1,4 +1,5 @@
 #include <termios.h>
+#include <stdlib.h>
 #include "header.h"
 
 char *USERS = "./data/users.txt";
@@ -40,10 +41,9 @@ int getPassword(struct User u)
 
     if ((fp = fopen("./data/users.txt", "r")) == NULL)
     {
-        printf("Error! opening file");
+        printf("Error! opening file\n");
         exit(1);
     }
-    int i = 0;
     while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
         if (strcmp(userChecker.name, u.name) == 0 && strcmp(userChecker.password, u.password) == 0)
@@ -57,7 +57,7 @@ int getPassword(struct User u)
     return 0;
 }
 
-void Rejestre(struct User *user)
+void Registration(struct User *user)
 {
     struct termios oflags, nflags;
     char pass[50];
@@ -94,5 +94,24 @@ notSame:
         perror("tcsetattr");
         return exit(1);
     }
+    user->id = TakeUserId()+1;
+    SaveUser(*user);
     createNewAcc(*user);
+}
+
+
+
+int TakeUserId() {
+    FILE *fp;
+    struct User userChecker;
+    if ((fp = fopen("./data/users.txt", "r")) == NULL)
+    {
+        printf("Error! opening file\n");
+        exit(1);
+    }
+     while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
+    {
+        
+    }
+    return userChecker.id;
 }

@@ -87,7 +87,7 @@ void initMenu(struct User *u)
             r = 1;
             break;
         case 2:
-            Rejestre(u);
+            Registration(u);
             // student TODO : add your **Registration** function
             // here
             r = 1;

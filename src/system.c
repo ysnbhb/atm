@@ -172,6 +172,20 @@ void checkAllAccounts(struct User u)
     success(u);
 }
 
+void SaveUser(struct User user)
+{
+    FILE *fp;
+    if ((fp = fopen("./data/users.txt", "a+")) == NULL)
+    {
+        printf("Error! opening file\n");
+        exit(1);
+    }
+    fprintf(fp, "%d %s %s\n",
+            user.id,
+            user.name,
+            user.password);
+}
+
 void clear()
 {
     char l;
