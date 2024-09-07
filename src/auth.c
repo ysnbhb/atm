@@ -94,14 +94,13 @@ notSame:
         perror("tcsetattr");
         return exit(1);
     }
-    user->id = TakeUserId()+1;
+    user->id = TakeUserId() + 1;
     SaveUser(*user);
     createNewAcc(*user);
 }
 
-
-
-int TakeUserId() {
+int TakeUserId()
+{
     FILE *fp;
     struct User userChecker;
     if ((fp = fopen("./data/users.txt", "r")) == NULL)
@@ -109,9 +108,8 @@ int TakeUserId() {
         printf("Error! opening file\n");
         exit(1);
     }
-     while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
+    while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
-        
     }
     return userChecker.id;
 }

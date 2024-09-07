@@ -42,3 +42,4 @@ void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
 void clear();
 void SaveUser(struct User u);
+int CheckTypeAccount(const char type[10]);

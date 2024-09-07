@@ -134,8 +134,11 @@ noAccount:
     scanf("%d", &r.phone);
     printf("\nEnter amount to deposit: $");
     scanf("%lf", &r.amount);
-    printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
-    scanf("%s", r.accountType);
+    do
+    {
+        printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
+        scanf("%s", r.accountType);
+    } while (CheckTypeAccount(r.accountType));
 
     saveAccountToFile(pf, u, r);
 
@@ -192,4 +195,11 @@ void clear()
     while ((l = getchar()) != EOF && l != '\n')
     {
     }
+}
+
+int CheckTypeAccount(const char type[10])
+{
+    if (strcmp(type, "saving") == 0 || strcmp(type, "current") == 0 || strcmp(type, "fixed01") == 0 || strcmp(type, "fixed02") == 0 || strcmp(type, "fixed03") == 0)
+        return 0;
+    return 1;
 }
