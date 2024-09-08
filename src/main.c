@@ -74,7 +74,7 @@ void initMenu(struct User *u)
         case 1:
             loginMenu(u->name, u->password);
             // printf("%s %s",u->name , u->password);
-            if (strcmp(u->password, getPassword(*u)))
+            if (strcmp(u->password, getPassword(*u))==0)
             {
                 printf("\n\nPassword Match!");
             }
@@ -86,9 +86,9 @@ void initMenu(struct User *u)
             r = 1;
             break;
         case 2:
-            Registration(u);
             // student TODO : add your **Registration** function
             // here
+            Registration(u);
             r = 1;
             break;
         case 3:
