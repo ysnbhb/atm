@@ -24,6 +24,7 @@ chois:
         createNewAcc(u);
         break;
     case 2:
+        Update(u);
         // student TODO : add your **Update account information** function
         // here
         break;

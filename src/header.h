@@ -48,4 +48,7 @@ void SaveUser(struct User u);
 int CheckTypeAccount(const char type[10]);
 int getAccountFromFile(FILE *pf , char name[50] , struct Record *r);
 float Calc(float amount, float num);
+void Update(struct User u);
+void cleanFile();
+void UpdatePhone(struct User u, int nbracc);
 

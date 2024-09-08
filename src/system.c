@@ -1,4 +1,5 @@
 #include "header.h"
+#include <stdlib.h>
 
 const char *RECORDS = "./data/records.txt";
 
@@ -20,7 +21,6 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 
 void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
-    printf("%d", r.id);
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r.id,
             u.id,
@@ -204,6 +204,7 @@ void ChechExistAcount(struct User u)
     int accountNbr;
     char name[50];
     float num;
+    char accept[3];
 notValid:
     printf("entre Account numbre : ");
     if (scanf("%d", &accountNbr) != 1)
@@ -248,14 +249,156 @@ notValid:
                 return;
             }
             printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
+            fclose(pf);
             success(u);
         }
     }
-    printf("this account Not Exist... \ntry again \n");
-    goto notValid;
+    printf("this account Not Exist... \ndo you want try again : \n(yes/no)");
+    scanf("%s", accept);
+    if (strcmp(accept, "ok") == 0)
+        goto notValid;
+    fclose(pf);
+    mainMenu(u);
 }
 
 float Calc(float amount, float num)
 {
     return (amount * num) / 12;
+}
+
+void Update(struct User u)
+{
+    int accountNbr, chois;
+notValid:
+    printf("entre Account numbre : ");
+    if (scanf("%d", &accountNbr) != 1)
+    {
+        clear();
+        printf("invalid forma \n");
+        goto notValid;
+    }
+    printf("what would you want update \n1) ->phone nubre\n2)->country\n enter you chois : ");
+NoOption:
+    if (scanf("%d", &chois))
+        clear();
+    switch (chois)
+    {
+    case 1:
+        printf("phone numbre\n");
+        UpdatePhone(u, accountNbr);
+
+        break;
+    case 2:
+        printf("country");
+        break;
+    default:
+        printf("invalid option... \n");
+        goto NoOption;
+    }
+}
+
+void cleanFile()
+{
+    FILE *fp = fopen(RECORDS, "w");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Failed to open file for truncation\n");
+        exit(EXIT_FAILURE);
+    }
+    fclose(fp);
+}
+
+void UpdatePhone(struct User u, int nbracc)
+{
+    int phone;
+    int validInput = 0;
+    int found = 0;
+notValid:
+    while (!validInput)
+    {
+        printf("Enter new phone number: ");
+        if (scanf("%d", &phone) == 1)
+        {
+            validInput = 1;
+        }
+        else
+        {
+            clear();
+        }
+    }
+
+    FILE *fp = fopen(RECORDS, "r+");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Failed to open file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int capacity = 10;
+    struct Record *r = malloc(sizeof(struct Record) * capacity);
+    struct User *user = malloc(sizeof(struct User) * capacity);
+    if (r == NULL || user == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        fclose(fp);
+        exit(EXIT_FAILURE);
+    }
+
+    int i = 0;
+    while (getAccountFromFile(fp, user[i].name, &r[i]))
+    {
+        if (strcmp(user[i].name, u.name) == 0 && r[i].accountNbr == nbracc)
+        {
+            found = 1;
+            r[i].phone = phone;
+        }
+        i++;
+
+        if (i >= capacity)
+        {
+            capacity *= 2;
+            r = realloc(r, sizeof(struct Record) * capacity);
+            user = realloc(user, sizeof(struct User) * capacity);
+            if (r == NULL || user == NULL)
+            {
+                fprintf(stderr, "Memory reallocation failed\n");
+                fclose(fp);
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+    if (found)
+    {
+        cleanFile(); // Clear the file before writing updated records
+
+        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
+        if (fp == NULL)
+        {
+            fprintf(stderr, "Failed to open file for writing\n");
+            free(r);
+            free(user);
+            exit(EXIT_FAILURE);
+        }
+
+        for (int j = 0; j < i; j++)
+        {
+            saveAccountToFile(fp, user[j], r[j]);
+        }
+        free(r);
+        free(user);
+        fclose(fp);
+        success(u);
+    }
+    else
+    {
+        free(r);
+        free(user);
+        fclose(fp);
+        char ok[5];
+        printf("use not found...\nwould you try again(yes/no) : ");
+        scanf("%s", ok);
+        if (strcmp(ok,"yes")==0)
+            goto notValid;
+        mainMenu(u);
+    }
 }
