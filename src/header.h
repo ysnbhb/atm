@@ -35,7 +35,9 @@ void registerMenu(char a[50], char pass[50]);
 const char *getPassword(struct User u);
 int TakeUserId();
 void Registration(struct User *u);
-int Chech_excit_user(struct User u);
+int Check_excit_user(struct User u);
+void ChechExistAcount(struct User u);
+//char *USERS = "./data/users.txt";
 
 // system function
 void createNewAcc(struct User u);
@@ -44,3 +46,6 @@ void checkAllAccounts(struct User u);
 void clear();
 void SaveUser(struct User u);
 int CheckTypeAccount(const char type[10]);
+int getAccountFromFile(FILE *pf , char name[50] , struct Record *r);
+float Calc(float amount, float num);
+

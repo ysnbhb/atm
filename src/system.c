@@ -198,3 +198,64 @@ int CheckTypeAccount(const char type[10])
         return 0;
     return 1;
 }
+
+void ChechExistAcount(struct User u)
+{
+    int accountNbr;
+    char name[50];
+    float num;
+notValid:
+    printf("entre Account numbre : ");
+    if (scanf("%d", &accountNbr) != 1)
+    {
+        clear();
+        printf("put numbre not string... \n");
+        goto notValid;
+    }
+    FILE *pf = fopen(RECORDS, "r");
+    struct Record r;
+    while (getAccountFromFile(pf, name, &r))
+    {
+        if (strcmp(name, u.name) == 0 && r.accountNbr == accountNbr)
+        {
+            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+                   r.accountNbr,
+                   r.deposit.day,
+                   r.deposit.month,
+                   r.deposit.year,
+                   r.country,
+                   r.phone,
+                   r.amount,
+                   r.accountType);
+            if (strcmp(r.accountType, "saving") == 0)
+            {
+                num = Calc(r.amount, 7.00 / 100);
+            }
+            else if ((strcmp(r.accountType, "fixed01") == 0))
+            {
+                num = Calc(r.amount, 4.00 / 100);
+            }
+            else if ((strcmp(r.accountType, "fixed02") == 0))
+            {
+                num = Calc(r.amount, 5.00 / 100);
+            }
+            else if ((strcmp(r.accountType, "fixed03") == 0))
+            {
+                num = Calc(r.amount, 8.00 / 100);
+            }
+            else
+            {
+                return;
+            }
+            printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
+            success(u);
+        }
+    }
+    printf("this account Not Exist... \ntry again \n");
+    goto notValid;
+}
+
+float Calc(float amount, float num)
+{
+    return (amount * num) / 12;
+}

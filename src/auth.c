@@ -4,6 +4,7 @@
 
 char *USERS = "./data/users.txt";
 
+
 void loginMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
@@ -39,7 +40,7 @@ const char *getPassword(struct User u)
     FILE *fp;
     struct User userChecker;
 
-    if ((fp = fopen("./data/users.txt", "r")) == NULL)
+    if ((fp = fopen(USERS, "r")) == NULL)
     {
         printf("Error! opening file\n");
         exit(1);
@@ -62,16 +63,19 @@ void Registration(struct User *user)
 {
     struct termios oflags, nflags;
     char pass[50];
-    while (1){
+    while (1)
+    {
         printf("\n\t\t\t\tUser Login \n");
         scanf("%s", user->name);
-        if(Chech_excit_user(*user)==0){
+        if (Check_excit_user(*user) == 0)
+        {
             printf("this user name is realy used , try anthor user name ...\n");
-        }else {
-             break;
+        }
+        else
+        {
+            break;
         }
     }
-
 
 notSame:
     tcgetattr(fileno(stdin), &oflags);
@@ -113,7 +117,7 @@ int TakeUserId()
 {
     FILE *fp;
     struct User userChecker;
-    if ((fp = fopen("./data/users.txt", "r")) == NULL)
+    if ((fp = fopen(USERS, "r")) == NULL)
     {
         printf("Error! opening file\n");
         exit(1);
@@ -124,11 +128,11 @@ int TakeUserId()
     return userChecker.id;
 }
 
-int Chech_excit_user(struct User u)
+int Check_excit_user(struct User u)
 {
     FILE *fp;
     struct User userChecker;
-    if ((fp = fopen("./data/users.txt", "r")) == NULL)
+    if ((fp = fopen(USERS, "r")) == NULL)
     {
         printf("Error! opening file\n");
         exit(1);
@@ -140,3 +144,4 @@ int Chech_excit_user(struct User u)
     }
     return 1;
 }
+
