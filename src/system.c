@@ -44,7 +44,8 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         printf("\n✖ Record not found!!\n");
     invalid:
         printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        scanf("%d", &option);
+        if (scanf("%d", &option) != 1)
+            clear();
         if (option == 0)
             f(u);
         else if (option == 1)
@@ -210,6 +211,7 @@ void ChechExistAcount(struct User u)
     char name[50];
     float num;
     char accept[3];
+    int found;
 notValid:
     printf("entre Account numbre : ");
     if (scanf("%d", &accountNbr) != 1)
@@ -224,6 +226,7 @@ notValid:
     {
         if (strcmp(name, u.name) == 0 && r.accountNbr == accountNbr)
         {
+            found = 1;
             printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
                    r.accountNbr,
                    r.deposit.day,
@@ -236,36 +239,29 @@ notValid:
             if (strcmp(r.accountType, "saving") == 0)
             {
                 num = Calc(r.amount, 7.00 / 100);
+                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
             }
             else if ((strcmp(r.accountType, "fixed01") == 0))
             {
                 num = Calc(r.amount, 4.00 / 100);
+                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
             }
             else if ((strcmp(r.accountType, "fixed02") == 0))
             {
                 num = Calc(r.amount, 5.00 / 100);
+                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
             }
             else if ((strcmp(r.accountType, "fixed03") == 0))
             {
                 num = Calc(r.amount, 8.00 / 100);
+                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
             }
-            else
-            {
-                return;
-            }
-            printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
-            fclose(pf);
-            success(u);
         }
     }
-    printf("this account Not Exist... \ndo you want try again : \n(yes/no)");
-    scanf("%s", accept);
-    clear();
-
-    if (strcmp(accept, "ok") == 0)
-        goto notValid;
     fclose(pf);
-    mainMenu(u);
+    if (found)
+        stayOrReturn(1, NULL, u);
+    stayOrReturn(0, ChechExistAcount, u);
 }
 
 float Calc(float amount, float num)
@@ -400,14 +396,7 @@ notValid:
         free(r);
         free(user);
         fclose(fp);
-        char ok[5];
-        printf("use not found...\nwould you try again(yes/no) : ");
-        scanf("%s", ok);
-        clear();
-
-        if (strcmp(ok, "yes") == 0)
-            goto notValid;
-        mainMenu(u);
+        stayOrReturn(0, Update, u);
     }
 }
 
@@ -487,13 +476,7 @@ notValid:
         free(r);
         free(user);
         fclose(fp);
-        char ok[5];
-        printf("use not found...\nwould you try again(yes/no) : ");
-        scanf("%s", ok);
-        clear();
-        if (strcmp(ok, "yes") == 0)
-            goto notValid;
-        mainMenu(u);
+        stayOrReturn(0, Update, u);
     }
 }
 
@@ -502,7 +485,6 @@ void Removeaccount(struct User u)
     int validInput = 0;
     int numbreacc;
     int found = 0;
-notValid:
     while (!validInput)
     {
         printf("Enter numbre account ");
@@ -595,12 +577,46 @@ notValid:
         free(r);
         free(user);
         fclose(fp);
-        char ok[5];
-        printf("use not found...\nwould you try again(yes/no) : ");
-        scanf("%s", ok);
-        clear();
-        if (strcmp(ok, "yes") == 0)
-            goto notValid;
-        mainMenu(u);
+        stayOrReturn(0, Removeaccount, u);
     }
 }
+
+void MakeTrans(struct User u)
+{
+    int option;
+    printf("1) Withdrawing\n2) Depositing money\n3) Create transactions\nChoose one of these options: ");
+
+    if (scanf("%d", &option) != 1)
+    {
+        clear();
+    }
+    switch (option)
+    {
+    case 1:
+        printf("withdrawing\n");
+        break;
+    case 2:
+        printf("depositing money\n");
+
+        break;
+    case 3:
+        printf("make  transactions\n");
+        break;
+    default:
+        printf("invalid optiones\n");
+        break;
+    }
+}
+
+void Withd(struct User u)
+{
+    int nmbAcc;
+    printf("Enter the account number you want to withdraw from: ");
+    if (scanf("%d", &nmbAcc) != 1)
+    {
+        clear();
+        exit(1);
+    }
+}
+
+// printf("Enter the account number you want to deposit into: ");

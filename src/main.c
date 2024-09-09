@@ -40,6 +40,7 @@ chois:
     case 5:
         // student TODO : add your **Make transaction** function
         // here
+        MakeTrans(u);
         break;
     case 6:
         // student TODO : add your **Remove existing account** function
