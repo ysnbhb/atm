@@ -113,8 +113,24 @@ notSame:
         return exit(1);
     }
     user->id = TakeUserId() + 1;
+
     SaveUser(*user);
     createNewAcc(*user);
+}
+
+void SaveUser(struct User user)
+{
+    FILE *fp;
+    if ((fp = fopen(USERS, "a")) == NULL)
+    {
+        printf("Error! opening file\n");
+        exit(1);
+    }
+    fprintf(fp, "%d %s %s\n",
+            user.id,
+            user.name,
+            user.password);
+    fclose(fp);
 }
 
 int TakeUserId()
