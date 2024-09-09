@@ -125,6 +125,8 @@ noAccount:
     }
     printf("\nEnter the country:");
     scanf("%s", r.country);
+    clear();
+
     printf("\nEnter the phone number:");
     scanf("%d", &r.phone);
     printf("\nEnter amount to deposit: $");
@@ -133,6 +135,8 @@ noAccount:
     {
         printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
         scanf("%s", r.accountType);
+        clear();
+
     } while (CheckTypeAccount(r.accountType));
     r.userId = u.id;
 
@@ -256,6 +260,8 @@ notValid:
     }
     printf("this account Not Exist... \ndo you want try again : \n(yes/no)");
     scanf("%s", accept);
+    clear();
+
     if (strcmp(accept, "ok") == 0)
         goto notValid;
     fclose(pf);
@@ -397,6 +403,8 @@ notValid:
         char ok[5];
         printf("use not found...\nwould you try again(yes/no) : ");
         scanf("%s", ok);
+        clear();
+
         if (strcmp(ok, "yes") == 0)
             goto notValid;
         mainMenu(u);
@@ -410,6 +418,7 @@ void UpdateCountry(struct User u, int nbracc)
 notValid:
     printf("enter new country : ");
     scanf("%s", nercountry);
+    clear();
 
     FILE *fp = fopen(RECORDS, "r+");
     if (fp == NULL)
@@ -466,6 +475,113 @@ notValid:
 
         for (int j = 0; j < i; j++)
         {
+            saveAccountToFile(fp, user[j], r[j]);
+        }
+        free(r);
+        free(user);
+        fclose(fp);
+        success(u);
+    }
+    else
+    {
+        free(r);
+        free(user);
+        fclose(fp);
+        char ok[5];
+        printf("use not found...\nwould you try again(yes/no) : ");
+        scanf("%s", ok);
+        if (strcmp(ok, "yes") == 0)
+            goto notValid;
+        mainMenu(u);
+    }
+}
+
+void Removeaccount(struct User u)
+{
+    int validInput = 0;
+    int numbreacc;
+    int found = 0;
+notValid:
+    while (!validInput)
+    {
+        printf("Enter numbre account ");
+        if (scanf("%d", &numbreacc) == 1)
+        {
+            validInput = 1;
+        }
+        else
+        {
+            clear();
+        }
+    }
+    FILE *fp = fopen(RECORDS, "r+");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Failed to open file\n");
+        exit(EXIT_FAILURE);
+    }
+    int capacity = 10;
+    struct Record *r = malloc(sizeof(struct Record) * capacity);
+    struct User *user = malloc(sizeof(struct User) * capacity);
+    struct Record checkRec;
+    // struct User checkUser ;
+    char name[50];
+
+    if (r == NULL || user == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        fclose(fp);
+        exit(EXIT_FAILURE);
+    }
+    int i = 0;
+    while (getAccountFromFile(fp, name, &checkRec))
+    {
+        if (strcmp(name, u.name) == 0 && checkRec.id == numbreacc)
+        {
+            found = 1;
+        }
+        else
+        {
+            r[i].deposit.day = checkRec.deposit.day;
+            r[i].deposit.month = checkRec.deposit.month;
+            r[i].deposit.year = checkRec.deposit.year;
+            strcpy(r[i].country, checkRec.country);
+            strcpy(user[i].name, name);
+            strcpy(r[i].accountType, checkRec.accountType);
+            r[i].amount = checkRec.amount;
+            r[i].phone = checkRec.phone;
+            r[i].userId = checkRec.userId;
+            i++;
+
+            if (i >= capacity)
+            {
+                capacity *= 2;
+                r = realloc(r, sizeof(struct Record) * capacity);
+                user = realloc(user, sizeof(struct User) * capacity);
+                if (r == NULL || user == NULL)
+                {
+                    fprintf(stderr, "Memory reallocation failed\n");
+                    fclose(fp);
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+    }
+    if (found)
+    {
+        cleanFile(); // Clear the file before writing updated records
+
+        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
+        if (fp == NULL)
+        {
+            fprintf(stderr, "Failed to open file for writing\n");
+            free(r);
+            free(user);
+            exit(EXIT_FAILURE);
+        }
+        for (int j = 0; j < i; j++)
+        {
+            r[j].id = j;
             saveAccountToFile(fp, user[j], r[j]);
         }
         free(r);

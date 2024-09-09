@@ -4,7 +4,6 @@
 
 char *USERS = "./data/users.txt";
 
-
 void loginMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
@@ -12,6 +11,7 @@ void loginMenu(char a[50], char pass[50])
     system("clear");
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:");
     scanf("%s", a);
+    clear();
 
     // disabling echo
     tcgetattr(fileno(stdin), &oflags);
@@ -26,7 +26,7 @@ void loginMenu(char a[50], char pass[50])
     }
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
     scanf("%s", pass);
-
+    clear();
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
@@ -67,6 +67,7 @@ void Registration(struct User *user)
     {
         printf("\n\t\t\t\tUser Login \n");
         scanf("%s", user->name);
+        clear();
         if (Check_excit_user(*user) == 0)
         {
             printf("this user name is realy used , try anthor user name ...\n");
@@ -90,9 +91,12 @@ notSame:
     }
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
     scanf("%s", user->password);
+    clear();
 
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login again :");
     scanf("%s", pass);
+    clear();
+
     if (strcmp(pass, user->password) != 0)
     {
         printf("not the same please try again : \n");
@@ -144,4 +148,3 @@ int Check_excit_user(struct User u)
     }
     return 1;
 }
-
