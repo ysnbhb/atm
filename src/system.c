@@ -490,6 +490,7 @@ notValid:
         char ok[5];
         printf("use not found...\nwould you try again(yes/no) : ");
         scanf("%s", ok);
+        clear();
         if (strcmp(ok, "yes") == 0)
             goto notValid;
         mainMenu(u);
@@ -597,6 +598,7 @@ notValid:
         char ok[5];
         printf("use not found...\nwould you try again(yes/no) : ");
         scanf("%s", ok);
+        clear();
         if (strcmp(ok, "yes") == 0)
             goto notValid;
         mainMenu(u);
