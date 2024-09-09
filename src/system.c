@@ -23,7 +23,7 @@ void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
 {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r.id,
-            u.id,
+            r.userId,
             u.name,
             r.accountNbr,
             r.deposit.month,
@@ -134,6 +134,7 @@ noAccount:
         printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
         scanf("%s", r.accountType);
     } while (CheckTypeAccount(r.accountType));
+    r.userId = u.id;
 
     saveAccountToFile(pf, u, r);
 
@@ -288,7 +289,7 @@ NoOption:
 
         break;
     case 2:
-        UpdateCountry(u,accountNbr);
+        UpdateCountry(u, accountNbr);
         break;
     default:
         printf("invalid option... \n");
@@ -433,7 +434,7 @@ notValid:
         if (strcmp(user[i].name, u.name) == 0 && r[i].accountNbr == nbracc)
         {
             found = 1;
-            strcpy(r[i].country,nercountry);
+            strcpy(r[i].country, nercountry);
         }
         i++;
 
