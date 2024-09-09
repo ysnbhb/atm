@@ -284,12 +284,11 @@ NoOption:
     switch (chois)
     {
     case 1:
-        printf("phone numbre\n");
         UpdatePhone(u, accountNbr);
 
         break;
     case 2:
-        printf("country");
+        UpdateCountry(u,accountNbr);
         break;
     default:
         printf("invalid option... \n");
@@ -397,7 +396,91 @@ notValid:
         char ok[5];
         printf("use not found...\nwould you try again(yes/no) : ");
         scanf("%s", ok);
-        if (strcmp(ok,"yes")==0)
+        if (strcmp(ok, "yes") == 0)
+            goto notValid;
+        mainMenu(u);
+    }
+}
+
+void UpdateCountry(struct User u, int nbracc)
+{
+    int found = 0;
+    char nercountry[100];
+notValid:
+    printf("enter new country : ");
+    scanf("%s", nercountry);
+
+    FILE *fp = fopen(RECORDS, "r+");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Failed to open file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int capacity = 10;
+    struct Record *r = malloc(sizeof(struct Record) * capacity);
+    struct User *user = malloc(sizeof(struct User) * capacity);
+    if (r == NULL || user == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        fclose(fp);
+        exit(EXIT_FAILURE);
+    }
+
+    int i = 0;
+    while (getAccountFromFile(fp, user[i].name, &r[i]))
+    {
+        if (strcmp(user[i].name, u.name) == 0 && r[i].accountNbr == nbracc)
+        {
+            found = 1;
+            strcpy(r[i].country,nercountry);
+        }
+        i++;
+
+        if (i >= capacity)
+        {
+            capacity *= 2;
+            r = realloc(r, sizeof(struct Record) * capacity);
+            user = realloc(user, sizeof(struct User) * capacity);
+            if (r == NULL || user == NULL)
+            {
+                fprintf(stderr, "Memory reallocation failed\n");
+                fclose(fp);
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+    if (found)
+    {
+        cleanFile(); // Clear the file before writing updated records
+
+        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
+        if (fp == NULL)
+        {
+            fprintf(stderr, "Failed to open file for writing\n");
+            free(r);
+            free(user);
+            exit(EXIT_FAILURE);
+        }
+
+        for (int j = 0; j < i; j++)
+        {
+            saveAccountToFile(fp, user[j], r[j]);
+        }
+        free(r);
+        free(user);
+        fclose(fp);
+        success(u);
+    }
+    else
+    {
+        free(r);
+        free(user);
+        fclose(fp);
+        char ok[5];
+        printf("use not found...\nwould you try again(yes/no) : ");
+        scanf("%s", ok);
+        if (strcmp(ok, "yes") == 0)
             goto notValid;
         mainMenu(u);
     }

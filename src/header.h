@@ -51,4 +51,5 @@ float Calc(float amount, float num);
 void Update(struct User u);
 void cleanFile();
 void UpdatePhone(struct User u, int nbracc);
+void UpdateCountry(struct User u , int nbb);
 
