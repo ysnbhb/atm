@@ -9,6 +9,7 @@ void loginMenu(char a[50], char pass[50])
     struct termios oflags, nflags;
 
     system("clear");
+
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:");
     scanf("%s", a);
     clear();
@@ -65,8 +66,14 @@ void Registration(struct User *user)
     char pass[50];
     while (1)
     {
-        printf("\n\t\t\t\tUser Login \n");
-        scanf("%s", user->name);
+        do
+        {
+            printf("\n\t\t\t\tUser Login \n");
+            scanf("%s", user->name);
+            clear();
+
+        } while (chechInput(user->name));
+
         clear();
         if (Check_excit_user(*user) == 0)
         {
@@ -89,8 +96,14 @@ notSame:
         perror("tcsetattr");
         return exit(1);
     }
-    printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
-    scanf("%s", user->password);
+    do
+    {
+        printf("\n\n\n\t\t\t\tEnter the password to login:");
+        scanf("%s", user->password);
+        clear();
+
+    } while (chechInput(user->password));
+
     clear();
 
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login again :");
@@ -163,4 +176,16 @@ int Check_excit_user(struct User u)
             return 0;
     }
     return 1;
+}
+
+int chechInput(const char r[50])
+{
+    int i = 0;
+    while (r[i] != '\0')
+    {
+        if (r[i] <= 32)
+            return 1;
+        i++;
+    }
+    return 0;
 }

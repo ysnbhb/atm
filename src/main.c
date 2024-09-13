@@ -15,9 +15,8 @@ void mainMenu(struct User u)
     printf("\n\t\t[7]- Transfer ownership\n");
     printf("\n\t\t[8]- Exit\n");
 chois:
-    if (scanf("%d", &option) != 1)
-        clear();
-
+    scanf("%d", &option);
+    clear();
     switch (option)
     {
     case 1:
@@ -50,6 +49,7 @@ chois:
     case 7:
         // student TODO : add your **Transfer owner** function
         // here
+        TranOwen(u);
         break;
     case 8:
         exit(1);
@@ -72,8 +72,8 @@ void initMenu(struct User *u)
     printf("\n\t\t[3]- exit\n");
     while (!r)
     {
-        if (scanf("%d", &option) != 1)
-            clear();
+        scanf("%d", &option);
+        clear();
         switch (option)
         {
         case 1:
