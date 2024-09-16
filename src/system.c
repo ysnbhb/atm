@@ -271,30 +271,32 @@ notValid:
                    r.accountType);
             if (strcmp(r.accountType, "saving") == 0)
             {
-                num = Calc(r.amount, 7.00 / 100);
-                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
+                num = r.amount * 7.00 / 100;
+                printf("You will get $%.2f as interest on day %d of every month\n", num / 12, r.deposit.day);
             }
             else if ((strcmp(r.accountType, "fixed01") == 0))
             {
-                num = Calc(r.amount, 4.00 / 100);
-                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
+                num = r.amount * 4.00 / 100;
+                printf("You will get $%.2f as interest on day %d/%d/%d\n", num, r.deposit.month, r.deposit.day, r.deposit.year + 1);
             }
             else if ((strcmp(r.accountType, "fixed02") == 0))
             {
-                num = Calc(r.amount, 5.00 / 100);
-                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
+                num = r.amount * 5.00 / 100;
+                printf("You will get $%.2f as interest on day %d/%d/%d\n", num *2, r.deposit.month, r.deposit.day, r.deposit.year + 2);
             }
             else if ((strcmp(r.accountType, "fixed03") == 0))
             {
-                num = Calc(r.amount, 8.00 / 100);
-                printf("You will get $%.2f as interest on day %d of every month\n", num, r.deposit.day);
+                num = r.amount * 8.00 / 100;
+                printf("You will get $%.2f as interest on day %d/%d/%d\n", num *3, r.deposit.month, r.deposit.day, r.deposit.year + 3);
             }
         }
     }
     fclose(pf);
-    if (found)
-        stayOrReturn(1, NULL, u);
-    stayOrReturn(0, ChechExistAcount, u);
+    if (!found)
+        printf("user not found \n");
+    printf("hit entre to return Menu...");
+    clear();
+    mainMenu(u);
 }
 
 float Calc(float amount, float num)
@@ -373,20 +375,20 @@ notValid:
     struct Record r;
     FILE *fp = fopen(RECORDS, "a+");
     FILE *chang = fopen(Change, "r+");
-    if (fp == NULL || chang ==NULL)
+    if (fp == NULL || chang == NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
 
     cleanFile();
-    while (getAccountFromFile(chang, u.name, &r))
+    while (getAccountFromFile(chang, user.name, &r))
     {
         if (r.accountNbr == nbracc)
         {
             r.phone = phone;
         }
-        saveAccountToFile(fp, u, r);
+        saveAccountToFile(fp, user, r);
     }
     fclose(fp);
     fclose(chang);
@@ -402,12 +404,14 @@ void UpdateCountry(struct User u, int nbracc)
     scanf("%s", newcountry);
     clear();
     FILE *chang = fopen(Change, "r+");
-    if (chang == NULL) {
+    if (chang == NULL)
+    {
         fprintf(stderr, "Failed to open change file\n");
         exit(EXIT_FAILURE);
     }
     FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         fprintf(stderr, "Failed to open records file\n");
         fclose(chang);
         exit(EXIT_FAILURE);
@@ -419,7 +423,7 @@ void UpdateCountry(struct User u, int nbracc)
     {
         if (r.accountNbr == nbracc)
         {
-            strcpy(r.country,newcountry);
+            strcpy(r.country, newcountry);
         }
         saveAccountToFile(fp, u, r);
     }
@@ -427,7 +431,6 @@ void UpdateCountry(struct User u, int nbracc)
     fclose(chang);
     remove(Change);
     success(u);
-
 }
 
 void Removeaccount(struct User u)
@@ -438,98 +441,38 @@ void Removeaccount(struct User u)
     while (!validInput)
     {
         printf("Enter numbre account ");
-        if (scanf("%d", &numbreacc) == 1)
-        {
-            validInput = 1;
-        }
-        else
-        {
-            clear();
-        }
+        validInput = scanf("%d", &numbreacc);
+        clear();
     }
-    clear();
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
+    if (!CheckEXictAcc(u, numbreacc))
+    {
+        printf("this account not exist\nPress entre to return to mune.");
+        clear();
+        mainMenu(u);
+    }
+
+    FILE *chang = fopen(Change, "r+");
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL || chang == NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    struct Record checkRec;
-    // struct User checkUser ;
-    char name[50];
-
-    if (r == NULL || user == NULL)
+    struct User user;
+    struct Record r;
+    cleanFile();
+    while (getAccountFromFile(chang, user.name, &r))
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
-        exit(EXIT_FAILURE);
-    }
-    int i = 0;
-    while (getAccountFromFile(fp, name, &checkRec))
-    {
-        if (strcmp(name, u.name) == 0 && checkRec.id == numbreacc)
+        if (r.accountNbr == numbreacc)
         {
-            found = 1;
+            continue;
         }
-        else
-        {
-            r[i].deposit.day = checkRec.deposit.day;
-            r[i].deposit.month = checkRec.deposit.month;
-            r[i].deposit.year = checkRec.deposit.year;
-            strcpy(r[i].country, checkRec.country);
-            strcpy(user[i].name, name);
-            strcpy(r[i].accountType, checkRec.accountType);
-            r[i].amount = checkRec.amount;
-            r[i].phone = checkRec.phone;
-            r[i].userId = checkRec.userId;
-            i++;
-
-            if (i >= capacity)
-            {
-                capacity *= 2;
-                r = realloc(r, sizeof(struct Record) * capacity);
-                user = realloc(user, sizeof(struct User) * capacity);
-                if (r == NULL || user == NULL)
-                {
-                    fprintf(stderr, "Memory reallocation failed\n");
-                    fclose(fp);
-                    exit(EXIT_FAILURE);
-                }
-            }
-        }
+        saveAccountToFile(fp, user, r);
     }
-    if (found)
-    {
-        cleanFile(); // Clear the file before writing updated records
-
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
-        }
-        for (int j = 0; j < i; j++)
-        {
-            r[j].id = j;
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
-    }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, Removeaccount, u);
-    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 }
 
 void MakeTrans(struct User u)
@@ -576,7 +519,13 @@ void Withd(struct User u)
             printf("Invalid input for account number.\n");
         }
     }
-nomony:
+    if (!CheckEXictAcc(u, nmbAcc))
+    {
+        printf("account not found...\nhit entre to entre the menu ");
+        clear();
+        mainMenu(u);
+    }
+
     valid = 0;
     while (!valid)
     {
@@ -588,79 +537,39 @@ nomony:
             printf("Invalid input for withdrawal amount.\n");
         }
     }
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
+    FILE *chang = fopen(Change, "r+");
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL || chang == NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    if (r == NULL || user == NULL)
+    struct User user;
+    struct Record r;
+    cleanFile();
+    while (getAccountFromFile(chang, user.name, &r))
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
-        exit(EXIT_FAILURE);
-    }
-    int i = 0;
-    while (getAccountFromFile(fp, user[i].name, &r[i]))
-    {
-        if (r[i].accountNbr == nmbAcc && strcmp(u.name, user[i].name) == 0)
+        if (r.accountNbr == nmbAcc)
         {
-            if (r[i].amount - mony < 0)
+            if (r.amount - mony < 0)
             {
-                printf("you don't have this mony this you account...\n");
-                goto nomony;
+                printf("You don't have enough money in this account.\nPress Enter to return to the menu...");
+                cleanFile();
+                Return();
+                clear();
+                mainMenu(u);
             }
             else
             {
-                found = 1;
-                r[i].amount -= mony;
+                r.amount -= mony;
             }
         }
-        i++;
-        if (i >= capacity)
-        {
-            capacity *= 2;
-            r = realloc(r, sizeof(struct Record) * capacity);
-            user = realloc(user, sizeof(struct User) * capacity);
-            if (r == NULL || user == NULL)
-            {
-                fprintf(stderr, "Memory reallocation failed\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
-        }
+        saveAccountToFile(fp, user, r);
     }
-    if (found)
-    {
-        cleanFile(); // Clear the file before writing updated records
-
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
-        }
-        for (int j = 0; j < i; j++)
-        {
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
-    }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, Withd, u);
-    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 }
 
 void Deposit(struct User u)
@@ -679,7 +588,12 @@ void Deposit(struct User u)
             printf("Invalid input for account number.\n");
         }
     }
-nomony:
+    if (!CheckEXictAcc(u, nmbAcc))
+    {
+        printf("account not found\nPress Enter to return to the menu...");
+        clear();
+        mainMenu(u);
+    }
     valid = 0;
     while (!valid)
     {
@@ -691,72 +605,28 @@ nomony:
             printf("Invalid input for deposit amount.\n");
         }
     }
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
+    FILE *chang = fopen(Change, "r+");
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL || chang == NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    if (r == NULL || user == NULL)
+    struct User user;
+    struct Record r;
+    cleanFile();
+    while (getAccountFromFile(chang, user.name, &r))
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
-        exit(EXIT_FAILURE);
-    }
-    int i = 0;
-    while (getAccountFromFile(fp, user[i].name, &r[i]))
-    {
-        if (r[i].accountNbr == nmbAcc && strcmp(u.name, user[i].name) == 0)
+        if (r.accountNbr == nmbAcc)
         {
-
-            found = 1;
-            r[i].amount += mony;
+            r.amount += mony;
         }
-        i++;
-        if (i >= capacity)
-        {
-            capacity *= 2;
-            r = realloc(r, sizeof(struct Record) * capacity);
-            user = realloc(user, sizeof(struct User) * capacity);
-            if (r == NULL || user == NULL)
-            {
-                fprintf(stderr, "Memory reallocation failed\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
-        }
+        saveAccountToFile(fp, user, r);
     }
-    if (found)
-    {
-        cleanFile(); // Clear the file before writing updated records
-
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
-        }
-        for (int j = 0; j < i; j++)
-        {
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
-    }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, Withd, u);
-    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 }
 
 void Trans(struct User u)
@@ -773,6 +643,19 @@ void Trans(struct User u)
             printf("Invalid input for numbre account.\n");
         }
     }
+    if (!CheckEXictAcc(u, from))
+    {
+        printf("this account dones't exist\nPress Enter to return to the menu.");
+        clear();
+        mainMenu(u);
+    }
+    else if (CheckAccType(from))
+    {
+        printf("This account has no right to make transaction\nPress Enter to return to the menu...");
+        remove(Change);
+        clear();
+        mainMenu(u);
+    }
     valid = 0;
     while (!valid)
     {
@@ -784,7 +667,13 @@ void Trans(struct User u)
             printf("Invalid input for numbre account.\n");
         }
     }
-nomony:
+    if (CheckAcc(to))
+    {
+        printf("The user you want to send to doesn't exist.\nPress Enter to return to the menu.");
+        remove(Change);
+        clear();
+        mainMenu(u);
+    }
     valid = 0;
     while (!valid)
     {
@@ -796,90 +685,44 @@ nomony:
             printf("Invalid input for  amount.\n");
         }
     }
-
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
+    FILE *chang = fopen(Change, "r+");
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL || chang == NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    if (r == NULL || user == NULL)
+    struct User user;
+    struct Record r;
+    cleanFile();
+
+    while (getAccountFromFile(chang, user.name, &r))
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
-        exit(EXIT_FAILURE);
-    }
-    int i = 0;
-    while (getAccountFromFile(fp, user[i].name, &r[i]))
-    {
-        if (r[i].accountNbr == from && strcmp(u.name, user[i].name) == 0)
+        if (r.accountNbr == from)
         {
-            if (NotAllow(r[i].accountType) == 1)
+            if (r.amount - mony < 0)
             {
-                printf("sorrey but you can't make transactions whit this account...\n");
-                return;
-            }
-            if (r[i].amount - mony < 0)
-            {
-                printf("you don't have this mony this you account...\n");
-                goto nomony;
+                printf("You don't have enough money in this account.\nPress Enter to return to the menu...");
+                cleanFile();
+                Return();
+                clear();
+                mainMenu(u);
             }
             else
             {
-                foundform = 1;
-                r[i].amount -= mony;
+                r.amount -= mony;
             }
         }
-        else if (r[i].accountNbr == to)
+        else if (r.accountNbr == to)
         {
-            foundto = 1;
-            r[i].amount += mony;
+            r.amount += mony;
         }
-        i++;
-        if (i >= capacity)
-        {
-            capacity *= 2;
-            r = realloc(r, sizeof(struct Record) * capacity);
-            user = realloc(user, sizeof(struct User) * capacity);
-            if (r == NULL || user == NULL)
-            {
-                fprintf(stderr, "Memory reallocation failed\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
-        }
+        saveAccountToFile(fp, user, r);
     }
-    if (foundform && foundto)
-    {
-        cleanFile(); // Clear the file before writing updated records
-
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
-        }
-        for (int j = 0; j < i; j++)
-        {
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
-    }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, Trans, u);
-    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 }
 
 int NotAllow(char type[10])
@@ -1033,4 +876,75 @@ int CheckEXictAcc(struct User u, int nbacc)
     if (!found)
         remove(Change);
     return found;
+}
+
+void Return()
+{
+    FILE *chang = fopen(Change, "r+");
+    if (chang == NULL)
+    {
+        fprintf(stderr, "Failed to open change file\n");
+        exit(EXIT_FAILURE);
+    }
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Failed to open records file\n");
+        fclose(chang);
+        exit(EXIT_FAILURE);
+    }
+    struct User u;
+    cleanFile();
+    struct User user;
+    struct Record r;
+    while (getAccountFromFile(chang, u.name, &r))
+    {
+
+        saveAccountToFile(fp, u, r);
+    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+}
+
+int CheckAcc(int acc)
+{
+    struct Record r;
+    FILE *fp = fopen(RECORDS, "r+");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Failed to open records file\n");
+        fclose(fp);
+        exit(EXIT_FAILURE);
+    }
+    char user[50];
+    while (getAccountFromFile(fp, user, &r))
+    {
+        if (r.accountNbr == acc)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int CheckAccType(int accnb)
+{
+    FILE *fp = fopen(RECORDS, "r+");
+    struct Record r;
+    if (fp == NULL)
+    {
+        fclose(fp);
+        fprintf(stderr, "can't open file");
+        exit(1);
+    }
+    char user[50];
+    while (getAccountFromFile(fp, user, &r))
+    {
+        if (r.accountNbr == accnb)
+        {
+            return NotAllow(r.accountType);
+        }
+    }
+    return -1;
 }

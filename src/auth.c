@@ -75,7 +75,7 @@ void Registration(struct User *user)
         } while (chechInput(user->name));
 
         clear();
-        if (Check_excit_user(*user) == 0)
+        if (Check_excit_user(user->name) == 0)
         {
             printf("this user name is realy used , try anthor user name ...\n");
         }
@@ -161,7 +161,7 @@ int TakeUserId()
     return userChecker.id;
 }
 
-int Check_excit_user(struct User u)
+int Check_excit_user(char u[50])
 {
     FILE *fp;
     struct User userChecker;
@@ -172,7 +172,7 @@ int Check_excit_user(struct User u)
     }
     while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
-        if (strcmp(u.name, userChecker.name) == 0)
+        if (strcmp(u, userChecker.name) == 0)
             return 0;
     }
     return 1;
