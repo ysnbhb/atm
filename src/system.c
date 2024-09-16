@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 const char *RECORDS = "./data/records.txt";
+const char *Change = "./data/change.txt";
 
 int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
 {
@@ -313,7 +314,13 @@ notValid:
         goto notValid;
     }
     clear();
-    printf("what would you want update \n1) ->phone nubre\n2)->country\n enter you chois : ");
+    if (!CheckEXictAcc(u, accountNbr))
+    {
+        printf("account not found...\nhit entre to entre the menu ");
+        clear();
+        mainMenu(u);
+    }
+    printf("what would you want update \n1)->phone numbre\n2)->country\n enter you chois : ");
 NoOption:
     scanf("%d", &chois);
     clear();
@@ -362,157 +369,65 @@ notValid:
         }
     }
     clear();
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
+    struct User user;
+    struct Record r;
+    FILE *fp = fopen(RECORDS, "a+");
+    FILE *chang = fopen(Change, "r+");
+    if (fp == NULL || chang ==NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
 
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    if (r == NULL || user == NULL)
+    cleanFile();
+    while (getAccountFromFile(chang, u.name, &r))
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
-        exit(EXIT_FAILURE);
-    }
-
-    int i = 0;
-    while (getAccountFromFile(fp, user[i].name, &r[i]))
-    {
-        if (strcmp(user[i].name, u.name) == 0 && r[i].accountNbr == nbracc)
+        if (r.accountNbr == nbracc)
         {
-            found = 1;
-            r[i].phone = phone;
+            r.phone = phone;
         }
-        i++;
-
-        if (i >= capacity)
-        {
-            capacity *= 2;
-            r = realloc(r, sizeof(struct Record) * capacity);
-            user = realloc(user, sizeof(struct User) * capacity);
-            if (r == NULL || user == NULL)
-            {
-                fprintf(stderr, "Memory reallocation failed\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
-        }
+        saveAccountToFile(fp, u, r);
     }
-    if (found)
-    {
-        cleanFile(); // Clear the file before writing updated records
-
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
-        }
-
-        for (int j = 0; j < i; j++)
-        {
-            r[i].userId = user[i].id;
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
-    }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, Update, u);
-    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 }
 
 void UpdateCountry(struct User u, int nbracc)
 {
     int found = 0;
-    char nercountry[100];
-notValid:
+    char newcountry[100];
     printf("enter new country : ");
-    scanf("%s", nercountry);
+    scanf("%s", newcountry);
     clear();
-
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
+    FILE *chang = fopen(Change, "r+");
+    if (chang == NULL) {
+        fprintf(stderr, "Failed to open change file\n");
         exit(EXIT_FAILURE);
     }
-
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    if (r == NULL || user == NULL)
-    {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open records file\n");
+        fclose(chang);
         exit(EXIT_FAILURE);
     }
-
-    int i = 0;
-    while (getAccountFromFile(fp, user[i].name, &r[i]))
+    cleanFile();
+    struct User user;
+    struct Record r;
+    while (getAccountFromFile(chang, u.name, &r))
     {
-        if (strcmp(user[i].name, u.name) == 0 && r[i].accountNbr == nbracc)
+        if (r.accountNbr == nbracc)
         {
-            found = 1;
-            strcpy(r[i].country, nercountry);
+            strcpy(r.country,newcountry);
         }
-        i++;
-
-        if (i >= capacity)
-        {
-            capacity *= 2;
-            r = realloc(r, sizeof(struct Record) * capacity);
-            user = realloc(user, sizeof(struct User) * capacity);
-            if (r == NULL || user == NULL)
-            {
-                fprintf(stderr, "Memory reallocation failed\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
-        }
+        saveAccountToFile(fp, u, r);
     }
-    if (found)
-    {
-        cleanFile(); // Clear the file before writing updated records
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
-        }
-
-        for (int j = 0; j < i; j++)
-        {
-            r[i].userId = user[i].id;
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
-    }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, Update, u);
-    }
 }
 
 void Removeaccount(struct User u)
@@ -1088,4 +1003,34 @@ int Take_id_User(char name[50])
     }
 
     return -1;
+}
+
+int CheckEXictAcc(struct User u, int nbacc)
+{
+    // char user[50];
+    struct Record r;
+    struct User user;
+    int found = 0;
+    FILE *fp, *chang;
+    remove(Change);
+    fp = fopen(RECORDS, "r");
+    chang = fopen(Change, "a+");
+    if (fp == NULL || chang == NULL)
+    {
+        fprintf(stderr, "can't open file");
+        exit(1);
+    }
+    while (getAccountFromFile(fp, user.name, &r))
+    {
+        if (strcmp(user.name, u.name) == 0 && nbacc == r.accountNbr)
+        {
+            found = 1;
+        }
+        saveAccountToFile(chang, user, r);
+    }
+    fclose(fp);
+    fclose(chang);
+    if (!found)
+        remove(Change);
+    return found;
 }

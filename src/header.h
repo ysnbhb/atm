@@ -12,8 +12,8 @@ struct Record
 {
     int id;
     int userId;
-    char name[100];
-    char country[100];
+    char name[50];
+    char country[50];
     int phone;
     char accountType[10];
     int accountNbr;
@@ -62,3 +62,4 @@ void Trans(struct User u);
 int NotAllow(char type[10]);
 void TranOwen(struct User u);
 int Take_id_User(char toname[50]);
+int CheckEXictAcc(struct User u, int nbacc);

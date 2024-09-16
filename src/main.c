@@ -1,5 +1,6 @@
 #include "header.h"
 
+
 void mainMenu(struct User u)
 {
     system("clear");
@@ -107,6 +108,8 @@ void initMenu(struct User *u)
 
 int main()
 {
+
+    printf("\t\t\t Note you can't use space in any input in app");
     struct User u;
 
     initMenu(&u);
