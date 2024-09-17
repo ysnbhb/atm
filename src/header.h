@@ -19,7 +19,6 @@ struct Record
     int accountNbr;
     double amount;
     struct Date deposit;
-    struct Date withdraw;
 };
 
 struct User
@@ -32,7 +31,7 @@ struct User
 // authentication functions
 void loginMenu(char a[50], char pass[50]);
 // void registerMenu(char a[50], char pass[50]);
-const char *getPassword(struct User u);
+const char *getPassword(struct User *u);
 int TakeUserId();
 void Registration(struct User *u);
 int Check_excit_user(char u[50]);

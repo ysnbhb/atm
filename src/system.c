@@ -282,12 +282,12 @@ notValid:
             else if ((strcmp(r.accountType, "fixed02") == 0))
             {
                 num = r.amount * 5.00 / 100;
-                printf("You will get $%.2f as interest on day %d/%d/%d\n", num *2, r.deposit.month, r.deposit.day, r.deposit.year + 2);
+                printf("You will get $%.2f as interest on day %d/%d/%d\n", num * 2, r.deposit.month, r.deposit.day, r.deposit.year + 2);
             }
             else if ((strcmp(r.accountType, "fixed03") == 0))
             {
                 num = r.amount * 8.00 / 100;
-                printf("You will get $%.2f as interest on day %d/%d/%d\n", num *3, r.deposit.month, r.deposit.day, r.deposit.year + 3);
+                printf("You will get $%.2f as interest on day %d/%d/%d\n", num * 3, r.deposit.month, r.deposit.day, r.deposit.year + 3);
             }
         }
     }
@@ -735,7 +735,7 @@ int NotAllow(char type[10])
 void TranOwen(struct User u)
 {
     int numacc;
-    int valid = 0, found = 0;
+    int valid = 0;
     char toname[50];
     int userid;
     while (!valid)
@@ -748,83 +748,49 @@ void TranOwen(struct User u)
         }
         clear();
     }
-    printf("entre the name of user you want send your account to : ");
+    if (!CheckEXictAcc(u, numacc))
+    {
+        printf("this account dones't exist\nPress Enter to return to the menu.");
+        clear();
+        mainMenu(u);
+    }
+    valid = 0;
+    printf("entre name user you want give him account: ");
     scanf("%s", toname);
     clear();
     userid = Take_id_User(toname);
     if (userid == -1)
     {
-        printf("user not found\n");
-        stayOrReturn(1, NULL, u);
+        printf("user you want give him account dones't exist\nPress entre to return to menu...");
+        remove(Change);
+        clear();
+        mainMenu(u);
     }
 
-    FILE *fp = fopen(RECORDS, "r+");
-    if (fp == NULL)
+    FILE *chang = fopen(Change, "r+");
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL || chang == NULL)
     {
         fprintf(stderr, "Failed to open file\n");
         exit(EXIT_FAILURE);
     }
-    int capacity = 10;
-    struct Record *r = malloc(sizeof(struct Record) * capacity);
-    struct User *user = malloc(sizeof(struct User) * capacity);
-    if (r == NULL || user == NULL)
-    {
-        fprintf(stderr, "Memory allocation failed\n");
-        fclose(fp);
-        exit(EXIT_FAILURE);
-    }
-    int i = 0;
-    while (getAccountFromFile(fp, user[i].name, &r[i]))
-    {
-        if (strcmp(u.name, user[i].name) == 0 && r[i].accountNbr == numacc)
-        {
-            r[i].userId = userid;
-            strcpy(user[i].name, toname);
-            found = 1;
-        }
+    struct User user;
+    struct Record r;
+    cleanFile();
 
-        i++;
-        if (i >= capacity)
-        {
-            capacity *= 2;
-            r = realloc(r, sizeof(struct Record) * capacity);
-            user = realloc(user, sizeof(struct User) * capacity);
-            if (r == NULL || user == NULL)
-            {
-                fprintf(stderr, "Memory reallocation failed\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
-    if (found)
+    while (getAccountFromFile(chang, user.name, &r))
     {
-        cleanFile(); // Clear the file before writing updated records
-
-        fp = fopen(RECORDS, "a"); // Reopen file in append mode to add records
-        if (fp == NULL)
+        if (r.accountNbr == numacc)
         {
-            fprintf(stderr, "Failed to open file for writing\n");
-            free(r);
-            free(user);
-            exit(EXIT_FAILURE);
+            r.userId = userid;
+            strcpy(user.name, toname);
         }
-        for (int j = 0; j < i; j++)
-        {
-            saveAccountToFile(fp, user[j], r[j]);
-        }
-        free(r);
-        free(user);
-        fclose(fp);
-        success(u);
+        saveAccountToFile(fp, user, r);
     }
-    else
-    {
-        free(r);
-        free(user);
-        fclose(fp);
-        stayOrReturn(0, TranOwen, u);
-    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(u);
 }
 
 int Take_id_User(char name[50])

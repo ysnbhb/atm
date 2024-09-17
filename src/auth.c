@@ -36,7 +36,7 @@ void loginMenu(char a[50], char pass[50])
     }
 };
 
-const char *getPassword(struct User u)
+const char *getPassword(struct User* u)
 {
     FILE *fp;
     struct User userChecker;
@@ -48,8 +48,9 @@ const char *getPassword(struct User u)
     }
     while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
-        if (strcmp(userChecker.name, u.name) == 0)
+        if (strcmp(userChecker.name, u->name) == 0)
         {
+            u->id = userChecker.id;
             char *buf = userChecker.password;
             fclose(fp);
             return buf;
