@@ -399,9 +399,12 @@ notValid:
 void UpdateCountry(struct User u, int nbracc)
 {
     int found = 0;
-    char newcountry[100];
+    char newcountry[50];
+    do {
     printf("enter new country : ");
     scanf("%s", newcountry);
+
+    }while(chechInput(newcountry));
     clear();
     FILE *chang = fopen(Change, "r+");
     if (chang == NULL)
