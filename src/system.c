@@ -361,7 +361,7 @@ notValid:
     while (!validInput)
     {
         printf("Enter new phone number: ");
-        if (scanf("%d", &phone) == 1)
+        if (scanf("%d", &phone) == 1 && phone > 0)
         {
             validInput = 1;
         }
@@ -400,11 +400,12 @@ void UpdateCountry(struct User u, int nbracc)
 {
     int found = 0;
     char newcountry[50];
-    do {
-    printf("enter new country : ");
-    scanf("%s", newcountry);
+    do
+    {
+        printf("enter new country : ");
+        scanf("%s", newcountry);
 
-    }while(chechInput(newcountry));
+    } while (chechInput(newcountry));
     clear();
     FILE *chang = fopen(Change, "r+");
     if (chang == NULL)
@@ -534,6 +535,10 @@ void Withd(struct User u)
     {
         printf("Enter how much you want to withdraw: ");
         valid = scanf("%lf", &mony);
+        if (mony <= 0)
+        {
+            valid = 0;
+        }
         clear();
         if (!valid)
         {
@@ -585,6 +590,10 @@ void Deposit(struct User u)
     {
         printf("Enter the account number you want to deposit into: ");
         valid = scanf("%d", &nmbAcc);
+         if (mony <= 0)
+        {
+            valid = 0;
+        }
         clear();
         if (!valid)
         {
@@ -682,6 +691,10 @@ void Trans(struct User u)
     {
         printf("entre how much you want send: ");
         valid = scanf("%d", &mony);
+         if (mony <= 0)
+        {
+            valid = 0;
+        }
         clear();
         if (!valid)
         {
