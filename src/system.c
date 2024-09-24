@@ -120,7 +120,7 @@ noAccount:
         valid = scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year);
         //  printf("%d",valid);
         clear();
-        if (r.deposit.month > 12 || r.deposit.month < 0 || r.deposit.day < 0 || r.deposit.day > 31 || r.deposit.year < 0 || valid != 3)
+        if (r.deposit.month > 12 || r.deposit.month <= 0 || r.deposit.day <= 0 || r.deposit.day > 31 || r.deposit.year < 1900 || valid != 3)
         {
             printf("This input is invalide");
             valid = 0;
@@ -173,8 +173,9 @@ noAccount:
         printf("\nEnter amount to deposit: $");
         valid = scanf("%lf", &r.amount);
         clear();
-        if (!valid)
+        if (!valid || r.amount <= 0)
         {
+            valid = 0;
             printf("This input is invalide");
         }
     }
@@ -243,7 +244,7 @@ void ChechExistAcount(struct User u)
     char name[50];
     float num;
     char accept[3];
-    int found;
+    int found=0;
 notValid:
     printf("entre Account numbre : ");
     if (scanf("%d", &accountNbr) != 1)
@@ -291,9 +292,10 @@ notValid:
             }
         }
     }
-    fclose(pf);
     if (!found)
         printf("user not found \n");
+
+    fclose(pf);
     printf("hit entre to return Menu...");
     clear();
     mainMenu(u);
@@ -590,7 +592,7 @@ void Deposit(struct User u)
     {
         printf("Enter the account number you want to deposit into: ");
         valid = scanf("%d", &nmbAcc);
-         if (mony <= 0)
+        if (mony <= 0)
         {
             valid = 0;
         }
@@ -691,7 +693,7 @@ void Trans(struct User u)
     {
         printf("entre how much you want send: ");
         valid = scanf("%d", &mony);
-         if (mony <= 0)
+        if (mony <= 0)
         {
             valid = 0;
         }
