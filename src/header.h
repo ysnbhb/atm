@@ -8,7 +8,7 @@ struct Date
 };
 
 // all fields for each record of an account
-struct Record
+typedef struct
 {
     int id;
     int userId;
@@ -19,49 +19,46 @@ struct Record
     int accountNbr;
     double amount;
     struct Date deposit;
-};
+} Record;
 
-struct User
+typedef struct
 {
     int id;
     char name[50];
     char password[50];
-};
+} User;
+
+typedef struct
+{
+    int found;
+    char type[10];
+} Valid;
 
 // authentication functions
 void loginMenu(char a[50], char pass[50]);
-// void registerMenu(char a[50], char pass[50]);
-const char *getPassword(struct User *u);
+const char *getPassword(User *u);
 int TakeUserId();
-void Registration(struct User *u);
+void Registration(User *u);
 int Check_excit_user(char u[50]);
-void ChechExistAcount(struct User u);
-void SaveUser(struct User u);
+void ChechExistAcount(User u);
+void SaveUser(User u);
 int chechInput(const char r[50]);
-// char *USERS = "./data/users.txt";
+
 
 // system function
-void createNewAcc(struct User u);
-void mainMenu(struct User u);
-void checkAllAccounts(struct User u);
+void createNewAcc(User u);
+void mainMenu(User u);
+void checkAllAccounts(User u);
 void clear();
 int CheckTypeAccount(const char type[10]);
-int getAccountFromFile(FILE *pf, char name[50], struct Record *r);
-float Calc(float amount, float num);
-void Update(struct User u);
+int getAccountFromFile(FILE *pf, char name[50], Record *r);
 void cleanFile();
-void UpdatePhone(struct User u, int nbracc);
-void UpdateCountry(struct User u, int nbb);
-void Removeaccount(struct User u);
-void MakeTrans(struct User u);
-void Withd(struct User u);
-void stayOrReturn(int notGood, void f(struct User u), struct User u);
-void Deposit(struct User u);
-void Trans(struct User u);
+void MakeTrans(User u);
 int NotAllow(char type[10]);
-void TranOwen(struct User u);
 int Take_id_User(char toname[50]);
-int CheckEXictAcc(struct User u, int nbacc);
+Valid CheckEXictAcc(User u, int nbacc);
 void Return();
 int CheckAcc(int acc);
-int CheckAccType(int accnb);
+void MakeTranc(User user, int type);
+void printMessage(int type);
+int FindTo(User user);

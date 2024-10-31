@@ -36,10 +36,10 @@ void loginMenu(char a[50], char pass[50])
     }
 };
 
-const char *getPassword(struct User* u)
+const char *getPassword(User* u)
 {
     FILE *fp;
-    struct User userChecker;
+     User userChecker;
 
     if ((fp = fopen(USERS, "r")) == NULL)
     {
@@ -61,7 +61,7 @@ const char *getPassword(struct User* u)
     return "user not excit";
 }
 
-void Registration(struct User *user)
+void Registration( User *user)
 {
     struct termios oflags, nflags;
     char pass[50];
@@ -132,7 +132,7 @@ notSame:
     createNewAcc(*user);
 }
 
-void SaveUser(struct User user)
+void SaveUser( User user)
 {
     FILE *fp;
     if ((fp = fopen(USERS, "a")) == NULL)
@@ -150,7 +150,7 @@ void SaveUser(struct User user)
 int TakeUserId()
 {
     FILE *fp;
-    struct User userChecker;
+     User userChecker;
     if ((fp = fopen(USERS, "r")) == NULL)
     {
         printf("Error! opening file\n");
@@ -165,7 +165,7 @@ int TakeUserId()
 int Check_excit_user(char u[50])
 {
     FILE *fp;
-    struct User userChecker;
+     User userChecker;
     if ((fp = fopen(USERS, "r")) == NULL)
     {
         printf("Error! opening file\n");

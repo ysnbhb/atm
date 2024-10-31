@@ -4,9 +4,7 @@
 
 2 1 Michel 123 10/10/2020 UK 222 12345.30 saving
 
-3 2 yassine 22 2/6/2004 dd 3424332 1001.20 fixed02
+3 1 Michel 22 2/6/2004 dd 3424332 1023.20 fixed02
 
-4 2 yassine 222 2/22/2004 lp 14521412 4444.00 saving
-
-1 2 yassine 33 2/22/2009 dd 332 22.00 saving
+4 2 yassine 222 2/22/2004 lp 14521412 4450.00 saving
 

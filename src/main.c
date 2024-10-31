@@ -1,7 +1,6 @@
 #include "header.h"
 
-
-void mainMenu(struct User u)
+void mainMenu(User u)
 {
     system("clear");
     int option;
@@ -24,7 +23,7 @@ chois:
         createNewAcc(u);
         break;
     case 2:
-        Update(u);
+        MakeTranc(u, 7);
         // student TODO : add your **Update account information** function
         // here
         break;
@@ -45,12 +44,12 @@ chois:
     case 6:
         // student TODO : add your **Remove existing account** function
         // here
-        Removeaccount(u);
+        MakeTranc(u, 4);
         break;
     case 7:
         // student TODO : add your **Transfer owner** function
         // here
-        TranOwen(u);
+        MakeTranc(u, 3);
         break;
     case 8:
         exit(1);
@@ -61,7 +60,7 @@ chois:
     }
 };
 
-void initMenu(struct User *u)
+void initMenu(User *u)
 {
     int r = 0;
     int option;
@@ -110,7 +109,7 @@ int main()
 {
 
     printf("\t\t\t Note you can't use space in any input in app");
-    struct User u;
+    User u;
 
     initMenu(&u);
     mainMenu(u);

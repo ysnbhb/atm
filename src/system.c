@@ -4,7 +4,7 @@
 const char *RECORDS = "./data/records.txt";
 const char *Change = "./data/change.txt";
 
-int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
+int getAccountFromFile(FILE *ptr, char name[50], Record *r)
 {
     return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
                   &r->id,
@@ -20,7 +20,7 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
                   r->accountType) != EOF;
 }
 
-void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
+void saveAccountToFile(FILE *ptr, User u, Record r)
 {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r.id,
@@ -36,48 +36,7 @@ void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
             r.accountType);
 }
 
-void stayOrReturn(int notGood, void f(struct User u), struct User u)
-{
-    int option;
-    if (notGood == 0)
-    {
-        system("clear");
-        printf("\n✖ Record not found!!\n");
-    invalid:
-        printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        scanf("%d", &option);
-        clear();
-        if (option == 0)
-            f(u);
-        else if (option == 1)
-            mainMenu(u);
-        else if (option == 2)
-            exit(0);
-        else
-        {
-            printf("Insert a valid operation!\n");
-            goto invalid;
-        }
-    }
-    else
-    {
-        printf("\nEnter 1 to go to the main menu and 0 to exit:");
-        scanf("%d", &option);
-        clear();
-    }
-    if (option == 1)
-    {
-        system("clear");
-        mainMenu(u);
-    }
-    else
-    {
-        system("clear");
-        exit(1);
-    }
-}
-
-void success(struct User u)
+void success(User u)
 {
     int option;
     printf("\n✔ Success!\n\n");
@@ -102,10 +61,10 @@ invalid:
     }
 }
 
-void createNewAcc(struct User u)
+void createNewAcc(User u)
 {
-    struct Record r;
-    struct Record cr;
+    Record r;
+    Record cr;
     char userName[50];
     FILE *pf = fopen(RECORDS, "a+");
     int valid = 0;
@@ -194,10 +153,10 @@ noAccount:
     success(u);
 }
 
-void checkAllAccounts(struct User u)
+void checkAllAccounts(User u)
 {
     char userName[100];
-    struct Record r;
+    Record r;
 
     FILE *pf = fopen(RECORDS, "r");
 
@@ -238,13 +197,13 @@ int CheckTypeAccount(const char type[10])
     return 1;
 }
 
-void ChechExistAcount(struct User u)
+void ChechExistAcount(User u)
 {
     int accountNbr;
     char name[50];
     float num;
     char accept[3];
-    int found=0;
+    int found = 0;
 notValid:
     printf("entre Account numbre : ");
     if (scanf("%d", &accountNbr) != 1)
@@ -255,7 +214,7 @@ notValid:
     }
     clear();
     FILE *pf = fopen(RECORDS, "r");
-    struct Record r;
+    Record r;
     while (getAccountFromFile(pf, name, &r))
     {
         if (strcmp(name, u.name) == 0 && r.accountNbr == accountNbr)
@@ -306,43 +265,6 @@ float Calc(float amount, float num)
     return (amount * num) / 12;
 }
 
-void Update(struct User u)
-{
-    int accountNbr, chois;
-notValid:
-    printf("entre Account numbre : ");
-    if (scanf("%d", &accountNbr) != 1)
-    {
-        clear();
-        printf("invalid forma \n");
-        goto notValid;
-    }
-    clear();
-    if (!CheckEXictAcc(u, accountNbr))
-    {
-        printf("account not found...\nhit entre to entre the menu ");
-        clear();
-        mainMenu(u);
-    }
-    printf("what would you want update \n1)->phone numbre\n2)->country\n enter you chois : ");
-NoOption:
-    scanf("%d", &chois);
-    clear();
-    switch (chois)
-    {
-    case 1:
-        UpdatePhone(u, accountNbr);
-
-        break;
-    case 2:
-        UpdateCountry(u, accountNbr);
-        break;
-    default:
-        printf("invalid option... \n");
-        goto NoOption;
-    }
-}
-
 void cleanFile()
 {
     FILE *fp = fopen(RECORDS, "w");
@@ -354,393 +276,22 @@ void cleanFile()
     fclose(fp);
 }
 
-void UpdatePhone(struct User u, int nbracc)
+void MakeTrans(User u)
 {
-    int phone;
-    int validInput = 0;
-    int found = 0;
-notValid:
-    while (!validInput)
-    {
-        printf("Enter new phone number: ");
-        if (scanf("%d", &phone) == 1 && phone > 0)
-        {
-            validInput = 1;
-        }
-        else
-        {
-            clear();
-        }
-    }
-    clear();
-    struct User user;
-    struct Record r;
-    FILE *fp = fopen(RECORDS, "a+");
-    FILE *chang = fopen(Change, "r+");
-    if (fp == NULL || chang == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
-        exit(EXIT_FAILURE);
-    }
-
-    cleanFile();
-    while (getAccountFromFile(chang, user.name, &r))
-    {
-        if (r.accountNbr == nbracc)
-        {
-            r.phone = phone;
-        }
-        saveAccountToFile(fp, user, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
-}
-
-void UpdateCountry(struct User u, int nbracc)
-{
-    int found = 0;
-    char newcountry[50];
-    do
-    {
-        printf("enter new country : ");
-        scanf("%s", newcountry);
-
-    } while (chechInput(newcountry));
-    clear();
-    FILE *chang = fopen(Change, "r+");
-    if (chang == NULL)
-    {
-        fprintf(stderr, "Failed to open change file\n");
-        exit(EXIT_FAILURE);
-    }
-    FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL)
-    {
-        fprintf(stderr, "Failed to open records file\n");
-        fclose(chang);
-        exit(EXIT_FAILURE);
-    }
-    cleanFile();
-    struct User user;
-    struct Record r;
-    while (getAccountFromFile(chang, u.name, &r))
-    {
-        if (r.accountNbr == nbracc)
-        {
-            strcpy(r.country, newcountry);
-        }
-        saveAccountToFile(fp, u, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
-}
-
-void Removeaccount(struct User u)
-{
-    int validInput = 0;
-    int numbreacc;
-    int found = 0;
-    while (!validInput)
-    {
-        printf("Enter numbre account ");
-        validInput = scanf("%d", &numbreacc);
-        clear();
-    }
-    if (!CheckEXictAcc(u, numbreacc))
-    {
-        printf("this account not exist\nPress entre to return to mune.");
-        clear();
-        mainMenu(u);
-    }
-
-    FILE *chang = fopen(Change, "r+");
-    FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL || chang == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
-        exit(EXIT_FAILURE);
-    }
-    struct User user;
-    struct Record r;
-    cleanFile();
-    while (getAccountFromFile(chang, user.name, &r))
-    {
-        if (r.accountNbr == numbreacc)
-        {
-            continue;
-        }
-        saveAccountToFile(fp, user, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
-}
-
-void MakeTrans(struct User u)
-{
-    int option;
-    printf("1) Withdrawing\n2) Depositing money\n3) Create transactions\nChoose one of these options: ");
-
+    int option = 200;
+    printf("1) Depositing\n2) Withdrawing\n3) Create transactions\nChoose one of these options: ");
+notOption:
     scanf("%d", &option);
-
     clear();
-    switch (option)
+    if (option <= 3 && option > 0)
     {
-    case 1:
-        printf("withdrawing\n");
-        Withd(u);
-        break;
-    case 2:
-        printf("depositing money\n");
-        Deposit(u);
-        break;
-    case 3:
-        printf("make  transactions\n");
-        Trans(u);
-        break;
-    default:
+        MakeTranc(u, option - 1);
+    }
+    else
+    {
         printf("invalid optiones\n");
-        break;
+        goto notOption;
     }
-}
-
-void Withd(struct User u)
-{
-    int nmbAcc;
-    int valid = 0;
-    int found = 0;
-    double mony;
-    while (!valid)
-    {
-        printf("Enter the account number you want to withdraw from: ");
-        valid = scanf("%d", &nmbAcc);
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for account number.\n");
-        }
-    }
-    if (!CheckEXictAcc(u, nmbAcc))
-    {
-        printf("account not found...\nhit entre to entre the menu ");
-        clear();
-        mainMenu(u);
-    }
-
-    valid = 0;
-    while (!valid)
-    {
-        printf("Enter how much you want to withdraw: ");
-        valid = scanf("%lf", &mony);
-        if (mony <= 0)
-        {
-            valid = 0;
-        }
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for withdrawal amount.\n");
-        }
-    }
-    FILE *chang = fopen(Change, "r+");
-    FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL || chang == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
-        exit(EXIT_FAILURE);
-    }
-    struct User user;
-    struct Record r;
-    cleanFile();
-    while (getAccountFromFile(chang, user.name, &r))
-    {
-        if (r.accountNbr == nmbAcc)
-        {
-            if (r.amount - mony < 0)
-            {
-                printf("You don't have enough money in this account.\nPress Enter to return to the menu...");
-                cleanFile();
-                Return();
-                clear();
-                mainMenu(u);
-            }
-            else
-            {
-                r.amount -= mony;
-            }
-        }
-        saveAccountToFile(fp, user, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
-}
-
-void Deposit(struct User u)
-{
-    int nmbAcc;
-    int valid = 0;
-    int found = 0;
-    double mony;
-    while (!valid)
-    {
-        printf("Enter the account number you want to deposit into: ");
-        valid = scanf("%d", &nmbAcc);
-        if (mony <= 0)
-        {
-            valid = 0;
-        }
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for account number.\n");
-        }
-    }
-    if (!CheckEXictAcc(u, nmbAcc))
-    {
-        printf("account not found\nPress Enter to return to the menu...");
-        clear();
-        mainMenu(u);
-    }
-    valid = 0;
-    while (!valid)
-    {
-        printf("Enter how much you want to deposit: ");
-        valid = scanf("%lf", &mony);
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for deposit amount.\n");
-        }
-    }
-    FILE *chang = fopen(Change, "r+");
-    FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL || chang == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
-        exit(EXIT_FAILURE);
-    }
-    struct User user;
-    struct Record r;
-    cleanFile();
-    while (getAccountFromFile(chang, user.name, &r))
-    {
-        if (r.accountNbr == nmbAcc)
-        {
-            r.amount += mony;
-        }
-        saveAccountToFile(fp, user, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
-}
-
-void Trans(struct User u)
-{
-    int from, to, foundform = 0, foundto = 0, mony;
-    int valid = 0;
-    while (!valid)
-    {
-        printf("entre numbre account you want take from it: ");
-        valid = scanf("%d", &from);
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for numbre account.\n");
-        }
-    }
-    if (!CheckEXictAcc(u, from))
-    {
-        printf("this account dones't exist\nPress Enter to return to the menu.");
-        clear();
-        mainMenu(u);
-    }
-    else if (CheckAccType(from))
-    {
-        printf("This account has no right to make transaction\nPress Enter to return to the menu...");
-        remove(Change);
-        clear();
-        mainMenu(u);
-    }
-    valid = 0;
-    while (!valid)
-    {
-        printf("entre numbre account you want send to it: ");
-        valid = scanf("%d", &to);
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for numbre account.\n");
-        }
-    }
-    if (CheckAcc(to))
-    {
-        printf("The user you want to send to doesn't exist.\nPress Enter to return to the menu.");
-        remove(Change);
-        clear();
-        mainMenu(u);
-    }
-    valid = 0;
-    while (!valid)
-    {
-        printf("entre how much you want send: ");
-        valid = scanf("%d", &mony);
-        if (mony <= 0)
-        {
-            valid = 0;
-        }
-        clear();
-        if (!valid)
-        {
-            printf("Invalid input for  amount.\n");
-        }
-    }
-    FILE *chang = fopen(Change, "r+");
-    FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL || chang == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
-        exit(EXIT_FAILURE);
-    }
-    struct User user;
-    struct Record r;
-    cleanFile();
-
-    while (getAccountFromFile(chang, user.name, &r))
-    {
-        if (r.accountNbr == from)
-        {
-            if (r.amount - mony < 0)
-            {
-                printf("You don't have enough money in this account.\nPress Enter to return to the menu...");
-                cleanFile();
-                Return();
-                clear();
-                mainMenu(u);
-            }
-            else
-            {
-                r.amount -= mony;
-            }
-        }
-        else if (r.accountNbr == to)
-        {
-            r.amount += mony;
-        }
-        saveAccountToFile(fp, user, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
 }
 
 int NotAllow(char type[10])
@@ -750,70 +301,9 @@ int NotAllow(char type[10])
     return 0;
 }
 
-void TranOwen(struct User u)
-{
-    int numacc;
-    int valid = 0;
-    char toname[50];
-    int userid;
-    while (!valid)
-    {
-        printf("entre numbre account you want to give: ");
-        valid = scanf("%d", &numacc);
-        if (!valid)
-        {
-            printf("invalid input for numbre acount\n");
-        }
-        clear();
-    }
-    if (!CheckEXictAcc(u, numacc))
-    {
-        printf("this account dones't exist\nPress Enter to return to the menu.");
-        clear();
-        mainMenu(u);
-    }
-    valid = 0;
-    printf("entre name user you want give him account: ");
-    scanf("%s", toname);
-    clear();
-    userid = Take_id_User(toname);
-    if (userid == -1)
-    {
-        printf("user you want give him account dones't exist\nPress entre to return to menu...");
-        remove(Change);
-        clear();
-        mainMenu(u);
-    }
-
-    FILE *chang = fopen(Change, "r+");
-    FILE *fp = fopen(RECORDS, "a+");
-    if (fp == NULL || chang == NULL)
-    {
-        fprintf(stderr, "Failed to open file\n");
-        exit(EXIT_FAILURE);
-    }
-    struct User user;
-    struct Record r;
-    cleanFile();
-
-    while (getAccountFromFile(chang, user.name, &r))
-    {
-        if (r.accountNbr == numacc)
-        {
-            r.userId = userid;
-            strcpy(user.name, toname);
-        }
-        saveAccountToFile(fp, user, r);
-    }
-    fclose(fp);
-    fclose(chang);
-    remove(Change);
-    success(u);
-}
-
 int Take_id_User(char name[50])
 {
-    struct User userChecker;
+    User userChecker;
     FILE *fp;
     fp = fopen("./data/users.txt", "r+");
     if ((fp == NULL))
@@ -832,12 +322,13 @@ int Take_id_User(char name[50])
     return -1;
 }
 
-int CheckEXictAcc(struct User u, int nbacc)
+Valid CheckEXictAcc(User u, int nbacc)
 {
     // char user[50];
-    struct Record r;
-    struct User user;
-    int found = 0;
+    Record r;
+    User user;
+    Valid found;
+    found.found = 0;
     FILE *fp, *chang;
     remove(Change);
     fp = fopen(RECORDS, "r");
@@ -851,13 +342,14 @@ int CheckEXictAcc(struct User u, int nbacc)
     {
         if (strcmp(user.name, u.name) == 0 && nbacc == r.accountNbr)
         {
-            found = 1;
+            found.found = 1;
+            strcpy(found.type, r.accountType);
         }
         saveAccountToFile(chang, user, r);
     }
     fclose(fp);
     fclose(chang);
-    if (!found)
+    if (!found.found)
         remove(Change);
     return found;
 }
@@ -877,10 +369,8 @@ void Return()
         fclose(chang);
         exit(EXIT_FAILURE);
     }
-    struct User u;
-    cleanFile();
-    struct User user;
-    struct Record r;
+    User u;
+    Record r;
     while (getAccountFromFile(chang, u.name, &r))
     {
 
@@ -893,7 +383,7 @@ void Return()
 
 int CheckAcc(int acc)
 {
-    struct Record r;
+    Record r;
     FILE *fp = fopen(RECORDS, "r+");
     if (fp == NULL)
     {
@@ -912,23 +402,221 @@ int CheckAcc(int acc)
     return 1;
 }
 
-int CheckAccType(int accnb)
+void MakeTranc(User user, int type)
 {
-    FILE *fp = fopen(RECORDS, "r+");
-    struct Record r;
-    if (fp == NULL)
+    int from, to, mony, phone, chois = 0;
+    int valid = 0;
+    char toname[50], newCountry[50];
+    while (!valid)
     {
-        fclose(fp);
-        fprintf(stderr, "can't open file");
-        exit(1);
-    }
-    char user[50];
-    while (getAccountFromFile(fp, user, &r))
-    {
-        if (r.accountNbr == accnb)
+        printMessage(type);
+        valid = scanf("%d", &from);
+        clear();
+        if (!valid)
         {
-            return NotAllow(r.accountType);
+            printf("Invalid input for numbre account.\n");
         }
     }
-    return -1;
+    Valid valide = CheckEXictAcc(user, from);
+    if (!valide.found)
+    {
+        printf("this account dones't exist\nPress Enter to return to the menu.");
+        clear();
+        mainMenu(user);
+    }
+    if (type == 0 || type == 1 || type == 2)
+        if (NotAllow(valide.type))
+        {
+            printf("This account has no right to make transaction\nPress Enter to return to the menu...");
+            remove(Change);
+            clear();
+            mainMenu(user);
+        }
+    int validInput = 0;
+    if (type == 7)
+    {
+        while (!chois)
+        {
+            printf("what would you want update \n1)->phone numbre\n2)->country\n enter you chois : ");
+            scanf("%d", &chois);
+            clear();
+            if (chois == 1)
+            {
+                while (!validInput)
+                {
+                    printf("Enter new phone number: ");
+                    if (scanf("%d", &phone) == 1 && phone > 0)
+                    {
+                        validInput = 1;
+                    }
+                    else
+                    {
+                        clear();
+                    }
+                }
+                type = 5;
+            }
+            else if (chois == 2)
+            {
+                do
+                {
+                    printf("enter new country : ");
+                    scanf("%s", newCountry);
+
+                } while (chechInput(newCountry));
+                type = 6;
+            }
+            else
+            {
+                printf("invalid Option");
+                chois = 0;
+            }
+        }
+    }
+    int userid;
+    valid = 0;
+    if (type == 2)
+    {
+        to = FindTo(user);
+    }
+    else if (type == 3)
+    {
+        printf("entre name user you want give him account: ");
+        scanf("%s", toname);
+        clear();
+        userid = Take_id_User(toname);
+        if (userid == -1)
+        {
+            printf("user you want give him account dones't exist\nPress entre to return to menu...");
+            remove(Change);
+            clear();
+            mainMenu(user);
+        }
+    }
+    if (type == 0 || type == 1 || type == 2)
+        while (!valid)
+        {
+            printf("entre how much mony : ");
+            valid = scanf("%d", &mony);
+            if (mony <= 0)
+            {
+                valid = 0;
+            }
+            clear();
+            if (!valid)
+            {
+                printf("Invalid input for  amount.\n");
+            }
+        }
+    FILE *chang = fopen(Change, "r+");
+    FILE *fp = fopen(RECORDS, "a+");
+    if (fp == NULL || chang == NULL)
+    {
+        fprintf(stderr, "Failed to open file\n");
+        exit(EXIT_FAILURE);
+    }
+    User userCheck;
+    Record r;
+    cleanFile();
+
+    while (getAccountFromFile(chang, userCheck.name, &r))
+    {
+        if (r.accountNbr == from)
+        {
+            if (type == 5)
+            {
+                r.phone = phone;
+            }
+            else if (type == 6)
+            {
+                strcpy(r.country, newCountry);
+            }
+            if (type == 4)
+            {
+                continue;
+            }
+            else if (type == 3)
+            {
+                r.userId = userid;
+                strcpy(userCheck.name, toname);
+            }
+            else if (type == 0)
+            {
+                r.amount += mony;
+            }
+            else
+            {
+                if (r.amount - mony < 0)
+                {
+                    printf("You don't have enough money in this account.\nPress Enter to return to the menu...");
+                    cleanFile();
+                    Return();
+                    clear();
+                    mainMenu(user);
+                }
+                r.amount -= mony;
+            }
+        }
+        else if (r.accountNbr == to && type == 2)
+        {
+            r.amount += mony;
+        }
+        saveAccountToFile(fp, userCheck, r);
+    }
+    fclose(fp);
+    fclose(chang);
+    remove(Change);
+    success(user);
+}
+
+int FindTo(User user)
+{
+    int valid = 0, to;
+    printf("entre numbre account you want send to");
+    while (!valid)
+    {
+        printf("entre numbre account you want send to it: ");
+        valid = scanf("%d", &to);
+        clear();
+        if (!valid)
+        {
+            printf("Invalid input for numbre account.\n");
+        }
+    }
+    if (CheckAcc(to))
+    {
+        printf("The user you want to send to doesn't exist.\nPress Enter to return to the menu.");
+        remove(Change);
+        clear();
+        mainMenu(user);
+    }
+    return to;
+}
+
+void printMessage(int type)
+{
+    if (type == 1)
+    {
+        printf("Enter the account number you want to withdraw from: ");
+    }
+    else if (type == 0)
+    {
+        printf("Enter the account number you want to deposit into: ");
+    }
+    else if (type == 2)
+    {
+        printf("entre numbre account you want take from it: ");
+    }
+    else if (type == 3)
+    {
+        printf("entre numbre account you want to give: ");
+    }
+    else if (type == 4)
+    {
+        printf("Enter numbre account you want delete : ");
+    }
+    else
+    {
+        printf("entre Account numbre : ");
+    }
 }
