@@ -324,7 +324,6 @@ int Take_id_User(char name[50])
 
 Valid CheckEXictAcc(User u, int nbacc)
 {
-    // char user[50];
     Record r;
     User user;
     Valid found;
@@ -531,7 +530,7 @@ void MakeTranc(User user, int type)
             {
                 strcpy(r.country, newCountry);
             }
-            if (type == 4)
+            else if (type == 4)
             {
                 continue;
             }
